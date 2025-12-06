@@ -1,0 +1,14 @@
+2025-11-29 14:35:48 [main] INFO  com.your_project.Application - Starting Application v0.0.1-SNAPSHOT using Java 17.0.2 with PID 1 (/app/app.jar started by root in /app)
+2025-11-29 14:35:48 [main] DEBUG com.your_project.Application - Running with Spring Boot v3.2.0, Spring v6.1.1
+2025-11-29 14:35:48 [main] INFO  com.your_project.Application - The following 1 profile is active: "prod"
+2025-11-29 14:35:51 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-11-29 14:35:51 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2025-11-29 14:35:51 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.16]
+2025-11-29 14:35:51 [main] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-11-29 14:35:51 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2302 ms
+2025-11-29 14:35:52 [main] INFO  c.b.m.e.spring.MybatisPlusApplicationContextAware - Register ApplicationContext instances org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@71812481
+2025-11-29 14:35:52 [main] INFO  o.s.boot.web.embedded.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path ''
+2025-11-29 14:35:52 [main] INFO  com.your_project.Application - Started Application in 5.319 seconds (process running for 6.596)
+2025-11-29 14:36:01 [http-nio-8080-exec-1] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-11-29 14:36:01 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-11-29 14:36:01 [http-nio-8080-exec-1] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 1 ms

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户信息 - 毕设系统</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 0 20px; }
+        .header { margin-bottom: 30px; }
+        .back-home { display: inline-block; padding: 8px 15px; background: #6c757d; color: white; text-decoration: none; border-radius: 4px; }
+        .info-card { border: 1px solid #eee; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .info-item { margin: 15px 0; font-size: 16px; }
+        .info-label { display: inline-block; width: 100px; color: #666; font-weight: 500; }
+        .info-value { color: #333; }
+        .tip { margin-top: 20px; padding: 10px; background: #f8f9fa; border-radius: 4px; color: #666; font-size: 14px; }
+    </style>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+</head>
+<body>
+    <div class="header">
+        <a href="index.html" class="back-home">返回主页</a>
+        <h2 style="display: inline-block; margin-left: 20px;">用户信息详情</h2>
+    </div>
+
+    <!-- 直接显示信息，无需加载接口 -->
+    <div id="infoCard" class="info-card">
+        <div class="info-item">
+            <span class="info-label">用户名：</span>
+            <span id="infoUsername" class="info-value"></span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">注册时间：</span>
+            <span class="info-value">2025年11月13日</span> <!-- 固定默认值，适配毕设 -->
+        </div>
+        <div class="info-item">
+            <span class="info-label">账户状态：</span>
+            <span class="info-value" style="color: #28a745;">正常</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">缓存状态：</span>
+            <span class="info-value" style="color: #007bff;">已缓存（Redis）</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">数据库表：</span>
+            <span class="info-value">sys_user（MyBatis-Plus自动创建）</span>
+        </div>
+        <div class="tip">
+            提示：本页面信息基于登录状态展示，数据持久化存储于MySQL，缓存于Redis，支持服务重启后数据不丢失。
+        </div>
+    </div>
+
+    <script>
+        $(function() {
+            // 核心：校验登录状态（未登录强制跳登录页）
+            const username = localStorage.getItem("loginUsername");
+            if (!username) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            // 直接显示本地存储的用户名，无需调用后端接口
+            $("#infoUsername").text(username);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+services:
+  nginx:
+    image: ${NGINX_IMAGE:-nginx:1.24-alpine}
+    container_name: app-nginx
+    ports:
+      - "${NGINX_PORT:-80:80}"
+    volumes:
+      - ${NGINX_CONF_DIR:-/opt/app/nginx/conf}:/etc/nginx/conf.d  # 用户挂载配置
+      - ${NGINX_HTML_DIR:-/opt/app/nginx/html}:/usr/share/nginx/html  # 用户挂载静态资源
+      - ${NGINX_LOG_DIR:-/opt/app/logs/nginx}:/var/log/nginx  # 用户挂载日志
+    environment:
+      - APP_ENV=${APP_ENV:-prod}
+    restart: ${RESTART_POLICY:-always}
+    deploy:
+      resources:
+        limits:
+          cpus: ${NGINX_CPU:-0.5}    # 按规定：最多0.5核CPU
+          memory: ${NGINX_MEM:-256m} # 按规定：最多256M内存
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  backend:
+    image: java-backend-app:6.0
+    container_name: app-backend
+    ports:
+      - "${BACKEND_PORT:-8081:8080}"
+    volumes:
+      - ${BACKEND_CONF_DIR:-/opt/app/backend/conf}:/app/src/main/resources 
+      - ${BACKEND_LOG_DIR:-/opt/app/logs/backend}:/var/log/java-backend  # 用户挂载日志
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/${MYSQL_DB:-app_db}?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER:-root}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PWD:-123456}
+      - JAVA_OPTS=${JAVA_OPTS:--Xms512m -Xmx1g}  # 按规定：JVM初始512M，最大1G
+      - SPRING_PROFILES_ACTIVE=${APP_ENV:-prod}
+    restart: ${RESTART_POLICY:-always}
+    deploy:
+      resources:
+        limits:
+          cpus: ${BACKEND_CPU:-1.5}   # 按规定：最多1.5核CPU（核心算力倾斜）
+          memory: ${BACKEND_MEM:-1.2g} # 按规定：最多1.2G内存
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  mysql:
+    image: ${MYSQL_IMAGE:-mysql:8.0}
+    container_name: app-mysql
+    ports:
+      - "${MYSQL_PORT:-3306:3306}"
+    volumes:
+      - mysql-data:/var/lib/mysql  # 命名卷管理核心数据
+      - ${MYSQL_CONF_DIR:-/opt/app/mysql/conf}:/etc/mysql/conf.d  # 用户挂载配置
+      - ${MYSQL_LOG_DIR:-/opt/app/logs/mysql}:/var/log/mysql  # 用户挂载日志
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PWD:-123456}
+      - MYSQL_DATABASE=${MYSQL_DB:-app_db}
+      - MYSQL_USER=${MYSQL_USER:-app_user}
+      - MYSQL_PASSWORD=${MYSQL_USER_PWD:-app_user123}
+      - MYSQL_CHARSET=utf8mb4
+      - MYSQL_COLLATION=utf8mb4_unicode_ci
+    restart: ${RESTART_POLICY:-always}
+    deploy:
+      resources:
+        limits:
+          cpus: ${MYSQL_CPU:-1.0}    # 按规定：最多1核CPU
+          memory: ${MYSQL_MEM:-1g}   # 按规定：最多1G内存（优化查询缓存）
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql-data:

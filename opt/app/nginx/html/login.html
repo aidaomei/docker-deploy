@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录 - 毕设系统</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 400px; margin: 50px auto; padding: 0 20px; }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .error { color: red; margin-top: 10px; text-align: center; }
+    </style>
+    <!-- 引入 jQuery（简化 AJAX 请求） -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+</head>
+<body>
+    <h2 style="text-align: center;">用户登录</h2>
+    <form id="loginForm">
+        <div class="form-group">
+            <label for="username">用户名：</label>
+            <input type="text" id="username" name="username" required placeholder="请输入用户名">
+        </div>
+        <div class="form-group">
+            <label for="password">密码：</label>
+            <input type="password" id="password" name="password" required placeholder="请输入密码">
+        </div>
+        <button type="submit">登录</button>
+        <div id="errorMsg" class="error"></div>
+    </form>
+
+    <script>
+        // 页面加载时，若已登录则直接跳主页
+        $(function() {
+            if (localStorage.getItem("loginUsername")) {
+                window.location.href = "index.html";
+            }
+
+            // 表单提交（阻止默认刷新，用 AJAX 调用后端接口）
+            $("#loginForm").submit(function(e) {
+                e.preventDefault(); // 禁止表单默认提交刷新
+                const username = $("#username").val().trim();
+                const password = $("#password").val().trim();
+
+                // 调用后端登录接口（路径必须加 /api 前缀，适配 Nginx 代理）
+                $.ajax({
+                    url: "/api/user/login", // 核心修改：对接 Nginx 代理后的接口
+                    method: "POST", // 与后端 UserController 接口方法一致（POST）
+                    data: { username: username, password: password },
+                    success: function(res) {
+                        // 后端返回格式示例：{code:200, msg:"登录成功", data:{username:"test"}}
+                        if (res.code === 200) {
+                            // 存储登录状态（用户名），供其他页面判断
+                            localStorage.setItem("loginUsername", username);
+                            // 登录成功跳主页
+                            window.location.href = "index.html";
+                        } else {
+                            // 登录失败提示（如用户名不存在、密码错误）
+                            $("#errorMsg").text(res.msg || "登录失败，请重试");
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        $("#errorMsg").text("接口请求失败，请检查服务是否正常");
+                        console.error("登录接口错误：", error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
